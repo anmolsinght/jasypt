@@ -1,0 +1,64 @@
+
+Jasypt (Java Simplified Encryption) Spring Boot provides utilities for encrypting property sources
+
+Include following in pom.xml --->
+
+Dependency-->
+	<dependency>
+        <groupId>com.github.ulisesbocchio</groupId>
+        <artifactId>jasypt-spring-boot-starter</artifactId>
+        <version>3.0.3</version>
+    </dependency>
+
+Plugin --->
+	<plugin>
+				<groupId>com.github.ulisesbocchio</groupId>	
+				<artifactId>jasypt-maven-plugin</artifactId>
+			</plugin>
+
+Put following annotation on main boot class--->
+@EnableEncryptableProperties
+
+
+application.properties---->
+Put DEC() around the text to be encrypted
+Run command --> D:\apache-maven-3.9.0\bin\mvn jasypt:encrypt -Djasypt.encryptor.password=idrive
+Run project using VM arg --> -Djasypt.encryptor.password=idrive
+
+
+application.yml---->
+Put DEC() around the text to be encrypted
+Run command --> D:\apache-maven-3.9.0\bin\mvn jasypt:encrypt -Djasypt.encryptor.password=idrive -Djasypt.plugin.path="file:src/main/resources/application.yml"
+
+
+Java config---->
+Create @Conficuration class and add following @Bean to it
+
+@Bean(name = "encryptorBean")
+public StringEncryptor stringEncryptor() {
+    PooledPBEStringEncryptor encryptor = new PooledPBEStringEncryptor();
+    SimpleStringPBEConfig config = new SimpleStringPBEConfig();
+    config.setPassword("password");
+    config.setAlgorithm("PBEWithMD5AndDES");
+    config.setKeyObtentionIterations("1000");
+    config.setPoolSize("1");
+    config.setProviderName("SunJCE");
+    config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator");
+    config.setStringOutputType("base64");
+    encryptor.setConfig(config);
+    return encryptor;
+}
+
+Create a dummy class to generate encrypted text for our required plain text.
+
+		JasyptEncryptorConfig cfg = new JasyptEncryptorConfig();
+		StringEncryptor enc = cfg.stringEncryptor();
+		String encryptedPassword = enc.encrypt("root");
+		System.out.println(encryptedPassword);
+
+Put this encrypted text in application.properties file for the field, for e.g.:
+
+	spring.datasource.password=ENC(NGB7KDdR/jHY996LZQeIXw==)
+
+Also, we need to add a property “jasypt.encryptor.bean” to our application.properties, so that Spring Boot knows which Custom Encryptor it should use.
+	jasypt.encryptor.bean=encryptorBean
