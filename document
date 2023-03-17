@@ -62,3 +62,10 @@ Put this encrypted text in application.properties file for the field, for e.g.:
 
 Also, we need to add a property “jasypt.encryptor.bean” to our application.properties, so that Spring Boot knows which Custom Encryptor it should use.
 	jasypt.encryptor.bean=encryptorBean
+	
+
+DECRYPTION--->
+
+mvn jasypt:decrypt-value -Djasypt.encryptor.password=idrive -Djasypt.plugin.value=nObqvmVPYhxVaykMl09QVtGCQWjpd7al1RJhOsyz1eLkb6J2USMu9Fb//e4a6Vro
+
+
